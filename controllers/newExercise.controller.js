@@ -1,10 +1,9 @@
-const User = require('../models/user.model');
 const Exercise = require('../models/exercise.model');
 const userFunctions = require('./common/userFunctions');
 
 exports.add_new_exercise = async function (req, res) {
     //ensure that user id is registered
-    let user = await userFunctions.user_exists_by_id(req);
+    let user = await userFunctions.user_exists_by_id(req.body.userId);
     if (!user) {
         res.send("Error, incorrect id.");
         return
@@ -20,12 +19,14 @@ const create_and_display_new_exercise = async function (req, res, user) {
             description: req.body.description,
             duration: req.body.duration
         });
-        if (isDateFormatValid(req.body.date)) {
-            exercise.date = req.body.date;
-        }
-        else {
-            res.send("Invalid date format : please use yyyy-mm-dd");
-            return
+        if (req.body.date) {
+            if (isDateFormatValid(req.body.date)) {
+                exercise.date = req.body.date;
+            }
+            else {
+                res.send("Invalid date format : please use yyyy-mm-dd");
+                return
+            }
         }
 
         exercise.save(function (err) {
@@ -47,9 +48,7 @@ function isDateFormatValid(date) {
     let result = date.match(regexp);
     if (result === null) { return false };
     if (result[1] > 1900 && result[1] < 2100 && result[2] > 0 && result[2] < 13 && result[3] > 0 && result[3] < 32) {
-        console.log("valid");
         return true;
     }
-    console.log("invalid");
     return false;
 }

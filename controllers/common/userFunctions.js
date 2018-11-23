@@ -2,7 +2,7 @@ const User = require('../../models/user.model');
 
 exports.user_exists_by_name = async function (req) {
     try {
-        let userExists = await User.findOne({ username: req.body.username }, function handleSearch(err){
+        let userExists = await User.findOne({ username: req.body.username },'_id username', function handleSearch(err){
             if (err) return handleError(err);
         });
         return userExists;
@@ -12,9 +12,9 @@ exports.user_exists_by_name = async function (req) {
     }
 }
 
-exports.user_exists_by_id = async function (req) {
+exports.user_exists_by_id = async function (id) {
     try {
-        let userExists = await User.findOne({ _id: req.body.userId }, function handleSearch(err){
+        let userExists = await User.findOne({ _id: id }, function handleSearch(err){
             if (err) return handleError(err);
         });
         return userExists;
