@@ -1,5 +1,6 @@
 const Exercise = require('../models/exercise.model');
 const userFunctions = require('./common/userFunctions');
+const dateFunctions = require('./common/dateFunctions');
 
 exports.add_new_exercise = async function (req, res) {
     //ensure that user id is registered
@@ -20,7 +21,7 @@ const create_and_display_new_exercise = async function (req, res, user) {
             duration: req.body.duration
         });
         if (req.body.date) {
-            if (isDateFormatValid(req.body.date)) {
+            if (dateFunctions.isDateFormatValid(req.body.date)) {
                 exercise.date = req.body.date;
             }
             else {
@@ -41,14 +42,4 @@ const create_and_display_new_exercise = async function (req, res, user) {
         console.log("error while saving exercise to db");
         return
     }
-}
-
-function isDateFormatValid(date) {
-    let regexp = /^(\d{4})-(\d{2})-(\d{2})$/;
-    let result = date.match(regexp);
-    if (result === null) { return false };
-    if (result[1] > 1900 && result[1] < 2100 && result[2] > 0 && result[2] < 13 && result[3] > 0 && result[3] < 32) {
-        return true;
-    }
-    return false;
 }

@@ -14,7 +14,7 @@ exports.user_exists_by_name = async function (req) {
 
 exports.user_exists_by_id = async function (id) {
     try {
-        let userExists = await User.findOne({ _id: id }, function handleSearch(err){
+        let userExists = await User.findOne({ _id: id }, '_id username', function handleSearch(err){
             if (err) return handleError(err);
         });
         return userExists;
