@@ -11,7 +11,10 @@ exports.retrieve_exercise_log = async function (req, res) {
         return
     }
 
-    let from, to, limit;
+    let from = "";
+    let to = "";
+    let limit = "";
+
     if (req.query.from) {
         if (dateFunctions.isDateFormatValid(req.query.from)) {
             from = new Date(req.query.from);
@@ -33,31 +36,24 @@ exports.retrieve_exercise_log = async function (req, res) {
     if (req.query.limit) {
         limit = req.query.limit;
     }
-
+    
     retrieve_and_display_log(req, res, user, from, to, limit);
 }
 
-retrieve_and_display_log = async function (req, res, user, from, to, limit) {
-    try {
-        let exercises = await Exercise.find({ user_id: req.query.userId }, 'description duration date', function handleSearch(err) {
-            if (err) return handleError(err);
-        })
-        //adjust results according to optional parameters
-        let selectedExercises = exercises;
-        if (from) {
-            selectedExercises = selectedExercises.filter((val) => val.date > from);
-        }
-        if (to) {
-            selectedExercises = selectedExercises.filter((val) => val.date < to);
-        }
-        if (limit) {
-            selectedExercises = selectedExercises.slice(0, limit);
-        }
+retrieve_and_display_log = function (req, res, user, from, to, limit) {
+    let query = Exercise.find({ user_id: req.query.userId });
+    query.select('description duration date');
 
-        res.json({ User: user, 'Total number of sessions': exercises.length, Log: selectedExercises });
-        return
-    } catch (e) {
-        console.log('error while fetching exercises');
-        return
-    }
+    //optionnally adjusts according dates
+    if (from) { query.where("date").gt(from); }
+    if (to) { query.where("date").lt(to); }
+
+    query.exec(function handleSearch(err, exercises) {
+        if (err) return handleError(err);
+        
+        //keep total count but optionnally limits output
+        let totalExercises = exercises.length;
+        if (limit) { exercises = exercises.slice(0, limit); }     
+        res.json({ User: user, 'Total number of sessions': totalExercises, Log: exercises });
+    });
 }
