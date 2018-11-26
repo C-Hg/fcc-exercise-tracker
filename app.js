@@ -16,7 +16,7 @@ db.once('open', () => console.log("Connected to database"));
 app.use(cors())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
-app.use(express.static('public'))
+app.use('/public', express.static(process.cwd() + '/public'));
 
 //importing routes
 const exercise_routes = require('./routes/exercise.route');
